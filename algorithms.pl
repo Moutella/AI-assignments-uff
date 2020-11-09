@@ -22,13 +22,39 @@ s(V1,V2):-sGH(_,_,V1,V2).
 %Definir o nó (estado) objetivo
 objetivo(f).
 
-%Gera todos os Caminhos possiveis a partir de Caminho.
-estende([No|Caminho],NovosCaminhos):-
-	findall([NovoNo,No|Caminho],
-            (	s(No,NovoNo),
-                not(member(NovoNo,[No|Caminho]))	),
-            NovosCaminhos),!.
+membro(X,[X|_]):-!.
+membro(X,[_|L]):-
+    membro(X,L).
 
+%hill climbing
+
+%Gera a solução se o nó sendo visitado é um nó objetivo
+%O nó colocado no caminho no passo anterior é um nó objetivo
+hillClimbing([H, Caminho], NoCorrente, [H, Solucao]):-	
+	objetivo(NoCorrente),                            
+	reverse(Caminho,Solucao).
+%O nó corrente não é um nó objetivo
+hillClimbing([H, Caminho], NoCorrente, Solucao) :-
+	geraNovo(NoCorrente, NoNovo, HNovo),				%Gera um novo estado
+	not(membro(NoNovo, Caminho)),	 %Evita ciclos na busca
+    append([NoNovo], Caminho, NovoCaminho),
+	hillClimbing([HNovo, NovoCaminho], NoNovo, Solucao). 
+	%Coloca o nó corrente no caminho e continua a recursão
+
+%pergunta: hillClimbing([40, [a]], a, S).
+
+geraNovo(NoCorrente, NoNovo, HNovo):-
+    geraCaminhos(NoCorrente, PossiveisNos),
+    min([HNovo, NoNovo], PossiveisNos).
+
+geraCaminhos(NoCorrente, NovosCaminhos):-
+    findall([HNovo,NovoNo],
+(	sH(HN,NoCorrente,NovoNo),
+	HNovo is HN), NovosCaminhos).
+
+min([[X,N1]],[[X,N1]]).
+min([X,N1],[[Y,_]|R]):- min([X, N1],R), X < Y, !.
+min([Y,N2],[[Y,N2]|_]).
 
 %best first
 
@@ -44,8 +70,6 @@ bestFirst([Caminho|Caminhos], Solucao) :-
 	ordena(Caminhos1,Caminhos2),
 	bestFirst(Caminhos2, Solucao). 	
 	%Coloca o nó corrente no caminho e continua a recursão
-
-%pergunta: aEstrela([[0,80,80,a]], S).
 
 %Gera todos os Caminhos possiveis a partir de Caminho.
 estendeBestFirst([_,No|Caminho],NovosCaminhos):-
