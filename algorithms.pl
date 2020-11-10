@@ -56,6 +56,25 @@ min([[X,N1]],[[X,N1]]).
 min([X,N1],[[Y,_]|R]):- min([X, N1],R), X < Y, !.
 min([Y,N2],[[Y,N2]|_]).
 
+%hill climbing v2
+
+hillClimbing2([[H, No|Caminho]|_], [H, Solucao]):-	
+	objetivo(No),                            
+	reverse([No|Caminho], Solucao).
+
+hillClimbing2([Caminho|Caminhos], Solucao) :-
+	estendeHillClimbing(Caminho, NovosCaminhos),
+    ordenaHillClimbing(NovosCaminhos, CaminhosOrd),
+    append(CaminhosOrd, Caminhos, Caminhos2),
+    hillClimbing2(Caminhos2, Solucao).
+	
+estendeHillClimbing([_,No|Caminho],PossiveisNos):-
+	findall([HNovo,NovoNo,No|Caminho],
+	(	sH(HN,No,NovoNo),
+		not(member(NovoNo,[No|Caminho])),
+		HNovo is HN),
+	PossiveisNos).
+
 %best first
 
 %Gera a solução se o nó sendo visitado é um nó objetivo
