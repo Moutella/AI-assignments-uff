@@ -5,7 +5,7 @@ sGH(110,67,a,c).
 sGH(53,45,a,e).
 sGH(45,40,e,b).
 sGH(65,40,b,d).
-sGH(67,43,b,c).
+sGH(43,67,b,c).
 sGH(45,40,c,d).
 sGH(70,0,d,f).
 sGH(52,0,e,f).
@@ -14,7 +14,6 @@ sGH(62,0,b,f).
 % sG(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - usa função de custo G
 sG(G,V1,V2):-sGH(G,_,V1,V2).
 % sH(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - usa função de avaliação H
-%sH(H,V1,V2):-sGH(H,_,V1,V2).
 sH(H,V1,V2):-sGH(_,H,V1,V2).
 % s(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - Não usa nenhuma heurística
 s(V1,V2):-sGH(_,_,V1,V2).
@@ -22,51 +21,17 @@ s(V1,V2):-sGH(_,_,V1,V2).
 %Definir o nó (estado) objetivo
 objetivo(f).
 
-membro(X,[X|_]):-!.
-membro(X,[_|L]):-
-    membro(X,L).
+%HILL CLIMBING
 
-%hill climbing
-
-%Gera a solução se o nó sendo visitado é um nó objetivo
-%O nó colocado no caminho no passo anterior é um nó objetivo
-hillClimbing([H, Caminho], NoCorrente, [H, Solucao]):-	
-	objetivo(NoCorrente),                            
-	reverse(Caminho,Solucao).
-%O nó corrente não é um nó objetivo
-hillClimbing([H, Caminho], NoCorrente, Solucao) :-
-	geraNovo(NoCorrente, NoNovo, HNovo),				%Gera um novo estado
-	not(membro(NoNovo, Caminho)),	 %Evita ciclos na busca
-    append([NoNovo], Caminho, NovoCaminho),
-	hillClimbing([HNovo, NovoCaminho], NoNovo, Solucao). 
-	%Coloca o nó corrente no caminho e continua a recursão
-
-%pergunta: hillClimbing([40, [a]], a, S).
-
-geraNovo(NoCorrente, NoNovo, HNovo):-
-    geraCaminhos(NoCorrente, PossiveisNos),
-    min([HNovo, NoNovo], PossiveisNos).
-
-geraCaminhos(NoCorrente, NovosCaminhos):-
-    findall([HNovo,NovoNo],
-(	sH(HN,NoCorrente,NovoNo),
-	HNovo is HN), NovosCaminhos).
-
-min([[X,N1]],[[X,N1]]).
-min([X,N1],[[Y,_]|R]):- min([X, N1],R), X < Y, !.
-min([Y,N2],[[Y,N2]|_]).
-
-%hill climbing v2
-
-hillClimbing2([[H, No|Caminho]|_], [H, Solucao]):-	
+hillClimbing([[H, No|Caminho]|_], [H, Solucao]):-	
 	objetivo(No),                            
 	reverse([No|Caminho], Solucao).
 
-hillClimbing2([Caminho|Caminhos], Solucao) :-
+hillClimbing([Caminho|Caminhos], Solucao) :-
 	estendeHillClimbing(Caminho, NovosCaminhos),
-    ordenaHillClimbing(NovosCaminhos, CaminhosOrd),
+    ordena(NovosCaminhos, CaminhosOrd),
     append(CaminhosOrd, Caminhos, Caminhos2),
-    hillClimbing2(Caminhos2, Solucao).
+    hillClimbing(Caminhos2, Solucao).
 	
 estendeHillClimbing([_,No|Caminho],PossiveisNos):-
 	findall([HNovo,NovoNo,No|Caminho],
@@ -74,14 +39,17 @@ estendeHillClimbing([_,No|Caminho],PossiveisNos):-
 		not(member(NovoNo,[No|Caminho])),
 		HNovo is HN),
 	PossiveisNos).
+	
+%pergunta: hillClimbing([[75,a]],S).
 
-%best first
+%BEST FIRST
 
 %Gera a solução se o nó sendo visitado é um nó objetivo
 %O nó gerado no passo anterior é um nó objetivo
 bestFirst([[H,No|Caminho]|_],[H,Solucao]):-	
 	objetivo(No),
 	reverse([No|Caminho],Solucao).
+	
 %O nó corrente não é um nó objetivo
 bestFirst([Caminho|Caminhos], Solucao) :-
 	estendeBestFirst(Caminho, NovosCaminhos), %Gera novos caminhos
@@ -92,20 +60,22 @@ bestFirst([Caminho|Caminhos], Solucao) :-
 
 %Gera todos os Caminhos possiveis a partir de Caminho.
 estendeBestFirst([_,No|Caminho],NovosCaminhos):-
-findall([HNovo,NovoNo,No|Caminho],
-(	sH(HN,No,NovoNo),
-	not(member(NovoNo,[No|Caminho])),
-	HNovo is HN),
-NovosCaminhos).
+	findall([HNovo,NovoNo,No|Caminho],
+	(	sH(HN,No,NovoNo),
+		not(member(NovoNo,[No|Caminho])),
+		HNovo is HN),
+	NovosCaminhos).
 
-%pergunta: bestFirst([[40,a]],S).
+%pergunta: bestFirst([[75,a]],S).
 
-%Branch and bound
+%BRANCH AND BOUND
+
 %Gera a solução se o nó sendo visitado é um nó objetivo
 %O nó gerado no passo anterior é um nó objetivo
 branchBound([[H,No|Caminho]|_],[H,Solucao]):-	
 	objetivo(No),
 	reverse([No|Caminho],Solucao).
+	
 %O nó corrente não é um nó objetivo
 branchBound([Caminho|Caminhos], Solucao) :-
 	estendeBranchBound(Caminho, NovosCaminhos), %Gera novos caminhos
@@ -116,11 +86,11 @@ branchBound([Caminho|Caminhos], Solucao) :-
 
 %Gera todos os Caminhos possiveis a partir de Caminho.
 estendeBranchBound([GC,No|Caminho],NovosCaminhos):-
-findall([GNovo,NovoNo,No|Caminho],
-(	sG(GN,No,NovoNo),
-	not(member(NovoNo,[No|Caminho])),
-	GNovo is GN + GC),
-NovosCaminhos).
+	findall([GNovo,NovoNo,No|Caminho],
+	(	sG(GN,No,NovoNo),
+		not(member(NovoNo,[No|Caminho])),
+		GNovo is GN + GC),
+	NovosCaminhos).
 
 %pergunta: branchBound([[0,a]],S).
 
