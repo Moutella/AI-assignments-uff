@@ -80,10 +80,14 @@ count([X1|T],X,Z):- X1\=X,count(T,X,Z).
 
 
 
-
-avaliador(2, _, 0):-
+%Não genérico, funcionará apenas em cubos 2x2
+%pois a soma máxima dos valores é 4
+%e o máximo seria 2 com 2 quadrados por lado
+avaliador(2, _, Valor):-
+    Valor is 0,
     !.
-avaliador(_,1,0):- 
+avaliador(_,1,Valor):- 
+    Valor is 0,
     !.
 avaliador(_, Max, Max).
 
@@ -99,6 +103,8 @@ maximo(X,[X|_]).
 avaliadorLado(Vals, Valor):-
 	count(Vals, 2, CoresComDois),
     maximo(MAX, Vals),
+    print(Vals),
+    print(CoresComDois),
     avaliador(CoresComDois, MAX, Valor).
     
     
