@@ -103,8 +103,6 @@ maximo(X,[X|_]).
 avaliadorLado(Vals, Valor):-
 	count(Vals, 2, CoresComDois),
     maximo(MAX, Vals),
-    print(Vals),
-    print(CoresComDois),
     avaliador(CoresComDois, MAX, Valor).
     
     
