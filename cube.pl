@@ -49,3 +49,90 @@ frenteHorario([[Cima1,Cima2,Cima3,Cima4],
             [Esq1,Baixo1,Esq3,Baixo2],
             [Dir3,Dir1,Baixo3,Baixo4]]
 ).
+
+
+%frenteHorario([[azul,azul,azul,azul],
+%     [vermelho,vermelho,vermelho,vermelho],
+%     [amarelo,amarelo,amarelo,amarelo],
+%     [laranja,laranja,laranja,laranja],
+%     [branco,branco,branco,branco],
+%     [verde,verde,verde,verde]],
+%	X
+%), 
+%frenteHorario(X,Y), 
+%frenteHorario(Y,Z),
+%direitaHorario(Z,Z2),
+%direitaHorario(Z2,Z3),
+%cimaHorario(Z3,Z4).
+%Cubo gerado:
+%[
+%  [verde, azul, amarelo, branco],
+%  [branco, azul, vermelho, laranja],
+%  [vermelho, laranja, verde, verde],
+%  [amarelo, amarelo, vermelho, laranja],
+%  [vermelho, laranja, branco, azul],
+%  [branco, azul, verde, amarelo]
+% ]
+    
+count([],_,0).
+count([X|T],X,Y):- count(T,X,Z), Y is 1+Z.
+count([X1|T],X,Z):- X1\=X,count(T,X,Z).
+
+avaliador(2, _, 0).
+avaliador(_, Max, Max).
+
+
+cabeca_calda(X, [X|Y], Y).
+maximo(X,L):-
+    cabeca_calda(LISTA_CABECA, L, LISTA_RESTO),
+    maximo(X,LISTA_RESTO),
+    X > LISTA_CABECA, !.
+maximo(X,[X]).
+maximo(X,[X|_]).
+
+avaliadorLado(Vals, Valor):-
+	count(Vals, 2, CoresComDois),
+    maximo(MAX, Vals),
+    avaliador(CoresComDois, MAX, Valor).
+    
+    
+
+
+contaLado(Lado, Valor):-
+    count(Lado, amarelo, ValorAmarelo),
+    count(Lado, azul, ValorAzul),
+    count(Lado, branco, ValorBranco),
+    count(Lado, vermelho, ValorVermelho),
+    count(Lado, laranja, ValorLaranja),
+    count(Lado, verde, ValorVerde),
+    avaliadorLado([
+		ValorAmarelo, ValorAzul, ValorVermelho,
+		ValorLaranja, ValorVerde, ValorBranco], Valor).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
