@@ -93,12 +93,9 @@ avaliador(_, Max, Max).
 
 
 cabeca_calda(X, [X|Y], Y).
-maximo(X,L):-
-    cabeca_calda(LISTA_CABECA, L, LISTA_RESTO),
-    maximo(X,LISTA_RESTO),
-    X > LISTA_CABECA, !.
-maximo(X,[X]).
-maximo(X,[X|_]).
+maximo(X, [X|[]]).
+maximo(X, [Y|L1]):- maximo(X,L1), X>Y, !.
+maximo(Y, [Y|_]).
 
 avaliadorLado(Vals, Valor):-
 	count(Vals, 2, CoresComDois),
@@ -129,3 +126,73 @@ contaCubo([L1,L2,L3,L4,L5,L6], ValorCubo):-
     contaLado(L5, Val5),
     contaLado(L6, Val6),
     ValorCubo is Val1+Val2+Val3+Val4+Val5+Val6.
+
+atribui(X,X).
+estendeCubo([_,[L1,L2,L3,L4,L5,L6]], CaminhosGerados):-
+    cimaHorario([L1,L2,L3,L4,L5,L6], Cubo1),
+    contaCubo(Cubo1, Valor1),
+    cimaHorario(Cubo2, [L1,L2,L3,L4,L5,L6]),
+    contaCubo(Cubo2, Valor2),
+    direitaHorario([L1,L2,L3,L4,L5,L6], Cubo3),
+    contaCubo(Cubo3, Valor3),
+    direitaHorario(Cubo4, [L1,L2,L3,L4,L5,L6]),
+    contaCubo(Cubo4, Valor4),
+    frenteHorario([L1,L2,L3,L4,L5,L6], Cubo5),
+    contaCubo(Cubo5, Valor5),
+    frenteHorario(Cubo6, [L1,L2,L3,L4,L5,L6]),
+    contaCubo(Cubo6, Valor6),
+    atribui(CaminhosGerados, [
+		[Valor1,Cubo1],
+		[Valor2,Cubo2],
+		[Valor3,Cubo3],
+		[Valor4,Cubo4],
+		[Valor5,Cubo5],
+		[Valor6,Cubo6]]).
+
+
+ordena(Caminhos,CaminhosOrd):-
+	quicksort(Caminhos,CaminhosOrd).
+
+quicksort([],[]).
+quicksort([X|Cauda],ListaOrd):-
+	particionar(X,Cauda,Menor,Maior),
+	quicksort(Menor,MenorOrd),
+	quicksort(Maior,MaiorOrd),
+	append(MenorOrd,[X|MaiorOrd],ListaOrd).
+
+particionar(_,[],[],[]).
+particionar(X,[Y|Cauda],[Y|Menor],Maior):-
+	maior(X,Y),!,
+	particionar(X,Cauda,Menor,Maior).
+particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
+	particionar(X,Cauda,Menor,Maior).
+
+maior([F1|_],[F2|_]) :- F1 < F2.
+
+
+
+%Definir o nó (estado) objetivo
+objetivo(24).
+
+%HILL CLIMBING
+%Definir o nó (estado) objetivo
+objetivo(f).
+
+%HILL CLIMBING
+
+hillClimbing([[H, Cubo]|_], [H, Cubo]):-	
+	objetivo(H), !.
+	%reverse([No|Caminho], Solucao).
+
+
+hillClimbing([Cubo|Cubos], Solucao) :-
+	estendeCubo(Cubo, NovosCubos),
+    ordena(NovosCubos, CubosOrd),
+    append(CubosOrd, Cubos, Cubos2),
+    hillClimbing(Cubos2, Solucao).
+
+
+
+
+
+
