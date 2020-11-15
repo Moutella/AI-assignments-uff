@@ -111,28 +111,11 @@ contaLado(Lado, Valor):-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+contaCubo([L1,L2,L3,L4,L5,L6], ValorCubo):-
+    contaLado(L1, Val1),
+    contaLado(L2, Val2),
+    contaLado(L3, Val3),
+    contaLado(L4, Val4),
+    contaLado(L5, Val5),
+    contaLado(L6, Val6),
+    ValorCubo is Val1+Val2+Val3+Val4+Val5+Val6.
