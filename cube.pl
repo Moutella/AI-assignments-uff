@@ -168,7 +168,9 @@ hillClimbing([Cubo|Cubos], Solucao) :-
 	estendeCubo(Cubo, NovosCubos),
     ordena(NovosCubos, CubosOrd),
     append(CubosOrd, Cubos, Cubos2),
+	%print(CubosOrd),
     hillClimbing(Cubos2, Solucao).
+
 
 
 
