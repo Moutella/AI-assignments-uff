@@ -49,99 +49,83 @@ frenteHorario([[Cima1,Cima2,Cima3,Cima4],
             [Esq1,Baixo1,Esq3,Baixo2],
             [Dir3,Dir1,Baixo3,Baixo4]]
 ).
-
-
-%frenteHorario([[azul,azul,azul,azul],
-%     [vermelho,vermelho,vermelho,vermelho],
-%     [amarelo,amarelo,amarelo,amarelo],
-%     [laranja,laranja,laranja,laranja],
-%     [branco,branco,branco,branco],
-%     [verde,verde,verde,verde]],
-%	X
-%), 
-%frenteHorario(X,Y), 
-%frenteHorario(Y,Z),
-%direitaHorario(Z,Z2),
-%direitaHorario(Z2,Z3),
-%cimaHorario(Z3,Z4).
-%Cubo gerado:
-%[
-%  [verde, azul, amarelo, branco],
-%  [branco, azul, vermelho, laranja],
-%  [vermelho, laranja, verde, verde],
-%  [amarelo, amarelo, vermelho, laranja],
-%  [vermelho, laranja, branco, azul],
-%  [branco, azul, verde, amarelo]
-% ]
     
+
+
+%Função auxiliar para contar quantas casas 
+%de cada cor há em um lado do cubo
 count([],_,0).
 count([X|T],X,Y):- count(T,X,Z), Y is 1+Z.
 count([X1|T],X,Z):- X1\=X,count(T,X,Z).
 
-
-
-%Não genérico, funcionará apenas em cubos 2x2
-%pois a soma máxima dos valores é 4
-%e o máximo seria 2 com 2 quadrados por lado
+%Caso 1: 2 lados possuem 2 casas de 2 cores, que está na restrição abaixo
+%Caso 2: Se o maior valor for 1(4 cores diferentes no lado), não é para atribuir pontos
+%Caso 3: Caso nenhum dos outros aconteça, 
+%teremos 2, 3, ou 4 casas de uma cor,
+%que é a pontuação deste lado
 avaliador(2, _, Valor):-
-    Valor is 0,
-    !.
+    Valor is 0, !.
 avaliador(_,1,Valor):- 
-    Valor is 0,
-    !.
-avaliador(_, Max, Max).
+    Valor is 0, !.
+avaliador(_, Valor, Valor).
 
-
-cabeca_calda(X, [X|Y], Y).
+%Máximo
 maximo(X, [X|[]]).
 maximo(X, [Y|L1]):- maximo(X,L1), X>Y, !.
 maximo(Y, [Y|_]).
 
-avaliadorLado(Vals, Valor):-
+%Para cada lado com 2 cores iguais, associe 2 pontos; 3 cores iguais – 3
+%pontos; 4 lados iguais – 4 pontos
+%Restrição: se um lado tiver 2 faces de uma cor e 2 faces de outra cor, não
+%pode somar 2 pontos
+pontosLado(Vals, Valor):-
 	count(Vals, 2, CoresComDois),
     maximo(MAX, Vals),
     avaliador(CoresComDois, MAX, Valor).
     
     
 
-
-contaLado(Lado, Valor):-
+%Conta quantos casas de cada cor há neste lado
+avaliaLado(Lado, Valor):-
     count(Lado, amarelo, ValorAmarelo),
     count(Lado, azul, ValorAzul),
     count(Lado, branco, ValorBranco),
     count(Lado, vermelho, ValorVermelho),
     count(Lado, laranja, ValorLaranja),
     count(Lado, verde, ValorVerde),
-    avaliadorLado([
+    pontosLado([
 		ValorAmarelo, ValorAzul, ValorVermelho,
 		ValorLaranja, ValorVerde, ValorBranco], Valor).
 
 
-
-contaCubo([L1,L2,L3,L4,L5,L6], ValorCubo):-
-    contaLado(L1, Val1),
-    contaLado(L2, Val2),
-    contaLado(L3, Val3),
-    contaLado(L4, Val4),
-    contaLado(L5, Val5),
-    contaLado(L6, Val6),
+%Avalia o valor de cada lado, sendo o ValorCubo, a soma deles
+avaliaCubo([L1,L2,L3,L4,L5,L6], ValorCubo):-
+    avaliaLado(L1, Val1),
+    avaliaLado(L2, Val2),
+    avaliaLado(L3, Val3),
+    avaliaLado(L4, Val4),
+    avaliaLado(L5, Val5),
+    avaliaLado(L6, Val6),
     ValorCubo is Val1+Val2+Val3+Val4+Val5+Val6.
 
+
+%Append preguiçoso
 atribui(X,X).
-estendeCubo([_,[L1,L2,L3,L4,L5,L6]], CaminhosGerados):-
+%Função que gera todos os próximos estados possíveis
+estendeCubo([_,[L1,L2,L3,L4,L5,L6]], CubosGerados):-
     cimaHorario([L1,L2,L3,L4,L5,L6], Cubo1),
-    contaCubo(Cubo1, Valor1),
+    avaliaCubo(Cubo1, Valor1),
     cimaHorario(Cubo2, [L1,L2,L3,L4,L5,L6]),
-    contaCubo(Cubo2, Valor2),
+    avaliaCubo(Cubo2, Valor2),
     direitaHorario([L1,L2,L3,L4,L5,L6], Cubo3),
-    contaCubo(Cubo3, Valor3),
+    avaliaCubo(Cubo3, Valor3),
     direitaHorario(Cubo4, [L1,L2,L3,L4,L5,L6]),
-    contaCubo(Cubo4, Valor4),
+    avaliaCubo(Cubo4, Valor4),
     frenteHorario([L1,L2,L3,L4,L5,L6], Cubo5),
-    contaCubo(Cubo5, Valor5),
+    avaliaCubo(Cubo5, Valor5),
     frenteHorario(Cubo6, [L1,L2,L3,L4,L5,L6]),
-    contaCubo(Cubo6, Valor6),
-    atribui(CaminhosGerados, [
+    avaliaCubo(Cubo6, Valor6),
+    atribui(CubosGerados, [
 		[Valor1,Cubo1],
 		[Valor2,Cubo2],
 		[Valor3,Cubo3],
@@ -150,8 +134,8 @@ estendeCubo([_,[L1,L2,L3,L4,L5,L6]], CaminhosGerados):-
 		[Valor6,Cubo6]]).
 
 
-ordena(Caminhos,CaminhosOrd):-
-	quicksort(Caminhos,CaminhosOrd).
+ordena(Cubos,CubosOrd):-
+	quicksort(Cubos,CubosOrd).
 
 quicksort([],[]).
 quicksort([X|Cauda],ListaOrd):-
@@ -172,18 +156,13 @@ maior([F1|_],[F2|_]) :- F1 < F2.
 
 
 %Definir o nó (estado) objetivo
+%O objetivo é o estado onde os 6 lados terão valor 4
 objetivo(24).
 
-%HILL CLIMBING
-%Definir o nó (estado) objetivo
-objetivo(f).
 
 %HILL CLIMBING
-
 hillClimbing([[H, Cubo]|_], [H, Cubo]):-	
 	objetivo(H), !.
-	%reverse([No|Caminho], Solucao).
-
 
 hillClimbing([Cubo|Cubos], Solucao) :-
 	estendeCubo(Cubo, NovosCubos),
