@@ -67,8 +67,47 @@ move([[A,B,C], [D,E,0], [G,H,I]],
 
 
 goal([[1,2,3],
-      [4,5,6],
-      [7,8,0]]).
+      [4,0,5],
+      [6,7,8]]).
+
+
+
+indexOf([], _, -4):- !. % se não estivar na lista, retornará -1(stonks) RIP GENERICIDADE
+indexOf([Element|_], Element, 0):-!. % We found the element
+indexOf([_|Tail], Element, Index):-
+  indexOf(Tail, Element, Index1), % Check in the tail of the list
+  Index is Index1+1.  % and increment the resulting index
+
+
+falseEhZero(false,0):- !.
+falseEhZero(Value,Value).
+
+nivel(X,-1,-1,1,X).
+nivel(-1,X,-1,2,X).
+nivel(-1,-1,X,3,X).
+
+
+geraPontuacao(IAtual,IDest,JAtual,JDest,E):-
+    E is abs(IAtual-IDest) + abs(JAtual-JDest).
+avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], X, Pts):-
+ 	indexOf([A,B,C],X,IndexAtual1),
+    indexOf([D,E,F],X,IndexAtual2),
+    indexOf([G,H,I],X,IndexAtual3),
+    nivel(IndexAtual1,IndexAtual2,IndexAtual3,JAtual,IAtual),
+    goal([L1,L2,L3]),
+    indexOf(L1,X,IndexDest1),
+    indexOf(L2,X,IndexDest2),
+    indexOf(L3,X,IndexDest3),
+    nivel(IndexDest1,IndexDest2,IndexDest3,JDest,IDest),
+    geraPontuacao(IAtual,IDest,JAtual,JDest, Pts).
+    
+    
+%avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], pontuacao):-
+ %   avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], 1, pt1),
+  % 	pontuacao is pt1+0.
+    
+  
+    
 
 dfs(S, Path, Path) :- goal(S).
 
