@@ -82,8 +82,8 @@ indexOf([_|Tail], Element, Index):-
 falseEhZero(false,0):- !.
 falseEhZero(Value,Value).
 
-nivel(X,-1,-1,1,X).
-nivel(-1,X,-1,2,X).
+nivel(X,-1,-1,1,X):- !.
+nivel(-1,X,-1,2,X):- !.
 nivel(-1,-1,X,3,X).
 
 
