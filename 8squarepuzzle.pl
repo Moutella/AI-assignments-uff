@@ -1,75 +1,89 @@
 %% mover para cima na linha central
-move([[A,B,C], [0,E,F], [G,H,I]],
+up([[A,B,C], [0,E,F], [G,H,I]],
 	[[0,B,C], [A,E,F], [G,H,I]]).
-move([[A,B,C], [D,0,F], [G,H,I]],
+up([[A,B,C], [D,0,F], [G,H,I]],
 	[[A,0,C], [D,B,F], [G,H,I]]).
-move([[A,B,C], [D,E,0], [G,H,I]],
+up([[A,B,C], [D,E,0], [G,H,I]],
      [[A,B,0], [D,E,C], [G,H,I]]).
 
 %% mover para cima na linha inferior
-move([[A,B,C], [D,E,F], [G,0,I]],
+up([[A,B,C], [D,E,F], [G,0,I]],
      [[A,B,C], [D,0,F], [G,E,I]]).
-move([[A,B,C], [D,E,F], [G,H,0]],
+up([[A,B,C], [D,E,F], [G,H,0]],
      [[A,B,C], [D,E,0], [G,H,F]]).
-move([[A,B,C], [D,E,F], [0,H,I]],
+up([[A,B,C], [D,E,F], [0,H,I]],
      [[A,B,C], [0,E,F], [D,H,I]]).
 % mover para esquerda na linha superior
-move([[A,0,C], [D,E,F], [G,H,I]],
+left([[A,0,C], [D,E,F], [G,H,I]],
      [[0,A,C], [D,E,F], [G,H,I]]).
-move([[A,B,0], [D,E,F], [G,H,I]],
+left([[A,B,0], [D,E,F], [G,H,I]],
      [[A,0,B], [D,E,F], [G,H,I]]).
 
 %% mover para esquerda na linha central
-move([[A,B,C], [D,0,F],[G,H,I]],
+left([[A,B,C], [D,0,F],[G,H,I]],
      [[A,B,C], [0,D,F],[G,H,I]]).
-move([[A,B,C], [D,E,0],[G,H,I]],
+left([[A,B,C], [D,E,0],[G,H,I]],
      [[A,B,C], [D,0,E],[G,H,I]]).
 
 %% mover para esquerda na linha inferior
-move([[A,B,C], [D,E,F], [G,0,I]], 
+left([[A,B,C], [D,E,F], [G,0,I]], 
      [[A,B,C], [D,E,F], [0,G,I]]).
-move([[A,B,C], [D,E,F], [G,H,0]],
+left([[A,B,C], [D,E,F], [G,H,0]],
      [[A,B,C], [D,E,F], [G,0,H]]).
 
 %% mover linha superior para direita
-move([[0,B,C], [D,E,F], [G,H,I]],
+right([[0,B,C], [D,E,F], [G,H,I]],
      [[B,0,C], [D,E,F], [G,H,I]]).
-move([[A,0,C], [D,E,F], [G,H,I]],
+right([[A,0,C], [D,E,F], [G,H,I]],
 	[[A,C,0], [D,E,F], [G,H,I]]).
 
 %% mover linha central para direita
-move([[A,B,C], [0,E,F], [G,H,I]],
+right([[A,B,C], [0,E,F], [G,H,I]],
      [[A,B,C], [E,0,F], [G,H,I]]).
-move([[A,B,C], [D,0,F], [G,H,I]],
+right([[A,B,C], [D,0,F], [G,H,I]],
      [[A,B,C], [D,F,0], [G,H,I]]).
 
 %% mover para direita na linha inferior
-move([[A,B,C], [D,E,F],[0,H,I]],
+right([[A,B,C], [D,E,F],[0,H,I]],
      [[A,B,C], [D,E,F],[H,0,I]]).
-move([[A,B,C], [D,E,F],[G,0,I]],
+right([[A,B,C], [D,E,F],[G,0,I]],
      [[A,B,C], [D,E,F],[G,I,0]]).
 
 %% mover para baixo na linha superior
-move([[0,B,C], [D,E,F], [G,H,I]],
+down([[0,B,C], [D,E,F], [G,H,I]],
      [[D,B,C], [0,E,F], [G,H,I]]).
-move([[A,0,C], [D,E,F], [G,H,I]],
+down([[A,0,C], [D,E,F], [G,H,I]],
      [[A,E,C], [D,0,F], [G,H,I]]).
-move([[A,B,0], [D,E,F], [G,H,I]],
+down([[A,B,0], [D,E,F], [G,H,I]],
      [[A,B,F], [D,E,0], [G,H,I]]).
 
 %% mover para baixo na linha central
-move([[A,B,C], [0,E,F], [G,H,I]],
+down([[A,B,C], [0,E,F], [G,H,I]],
      [[A,B,C], [G,E,F], [0,H,I]]).
-move([[A,B,C], [D,0,F], [G,H,I]],
+down([[A,B,C], [D,0,F], [G,H,I]],
      [[A,B,C], [D,H,F], [G,0,I]]).
-move([[A,B,C], [D,E,0], [G,H,I]],
+down([[A,B,C], [D,E,0], [G,H,I]],
      [[A,B,C], [D,E,I], [G,H,0]]).
 
 
-goal([[1,2,3],
+objetivo([[1,2,3],
       [4,0,5],
       [6,7,8]]).
 
+move(P1,P2, 'up'):-
+    up(P1,P2).
+
+move(P1,P2, 'down'):-
+    down(P1,P2).
+
+move(P1,P2, 'right'):-
+    right(P1,P2).
+
+move(P1,P2, 'left'):-
+    left(P1,P2).
+
+% move([[8,2,3], [0,4,5], [6,7,1]],EstadoFuturo,'right'),
+% move(EstadoFuturo,EstadoFuturo2,'up')
 
 
 indexOf([], _, -4):- !. % se não estivar na lista, retornará -1(stonks) RIP GENERICIDADE
@@ -94,27 +108,63 @@ avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], X, Pts):-
     indexOf([D,E,F],X,IndexAtual2),
     indexOf([G,H,I],X,IndexAtual3),
     nivel(IndexAtual1,IndexAtual2,IndexAtual3,JAtual,IAtual),
-    goal([L1,L2,L3]),
+    objetivo([L1,L2,L3]),
     indexOf(L1,X,IndexDest1),
     indexOf(L2,X,IndexDest2),
     indexOf(L3,X,IndexDest3),
     nivel(IndexDest1,IndexDest2,IndexDest3,JDest,IDest),
     geraPontuacao(IAtual,IDest,JAtual,JDest, Pts).
     
-    
-%avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], pontuacao):-
- %   avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], 1, pt1),
-  % 	pontuacao is pt1+0.
-    
-  
-    
 
-dfs(S, Path, Path) :- goal(S).
+avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], PtsPuzzle):-
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], A, PtsA),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], B, PtsB),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], C, PtsC),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], D, PtsD),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], E, PtsE),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], F, PtsF),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], G, PtsG),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], H, PtsH),
+    avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], I, PtsI),
+    PtsPuzzle is PtsA+PtsB+PtsC+PtsD+PtsE+PtsF+PtsG+PtsH+PtsI.
 
-dfs(S, Checked, Path) :-
-    % try a move
-    move(S, S2),
-    % ensure the resulting state is new
-    \+member(S2, Checked),
-    % and that this state leads to the goal
-    dfs(S2, [S2|Checked], Path).
+%- avaliaPuzzle([[8,2,3], [0,4,5], [6,7,1]],Pts).
+
+estendeBestFirst([_, Puzzle],Novos):-
+    findall([HNovo, PuzzleNovo], (move(Puzzle, PuzzleNovo,_), avaliaPuzzle(PuzzleNovo, HNovo)), Novos).
+    
+%- estendeBestFirst([_, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
+%Gera a solução se o nó sendo visitado é um nó objetivo
+%O nó gerado no passo anterior é um nó objetivo
+bestFirst([[H,Puzzle]|_],[H,Solucao]):-	
+	objetivo(Puzzle),
+	reverse([Puzzle],Solucao).
+	
+%O nó corrente não é um nó objetivo
+bestFirst([Puzzle|Puzzles], Solucao) :-
+	estendeBestFirst(Puzzle, NovosPuzzles), %Gera novos Puzzles
+    print(NovosPuzzles),
+	append(Puzzles,NovosPuzzles,Puzzles1),	
+	ordena(Puzzles1,Puzzles2),
+	bestFirst(Puzzles2, Solucao). 	
+	%Coloca o nó corrente no Puzzle e continua a recursão
+
+%Ordenas os Caminhos por F
+ordena(Caminhos,CaminhosOrd):-
+	quicksort(Caminhos,CaminhosOrd).
+
+quicksort([],[]).
+quicksort([X|Cauda],ListaOrd):-
+	particionar(X,Cauda,Menor,Maior),
+	quicksort(Menor,MenorOrd),
+	quicksort(Maior,MaiorOrd),
+	append(MenorOrd,[X|MaiorOrd],ListaOrd).
+
+particionar(_,[],[],[]).
+particionar(X,[Y|Cauda],[Y|Menor],Maior):-
+	maior(X,Y),!,
+	particionar(X,Cauda,Menor,Maior).
+particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
+	particionar(X,Cauda,Menor,Maior).
+
+maior([F1|_],[F2|_]) :- F1 < F2.
