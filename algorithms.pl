@@ -1,115 +1,82 @@
-%Definição das arestas do Grafo
-%sGH(G(n),H(n),VerticeOrigem,VerticeDestino)
-sGH(63,40,a,b).
-sGH(110,67,a,c).
-sGH(53,45,a,e).
-sGH(45,40,e,b).
-sGH(65,40,b,d).
-sGH(43,67,b,c).
-sGH(45,40,c,d).
-sGH(70,0,d,f).
-sGH(52,0,e,f).
-sGH(62,0,b,f).
 
-% sG(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - usa função de custo G
-sG(G,V1,V2):-sGH(G,_,V1,V2).
-% sH(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - usa função de avaliação H
-sH(H,V1,V2):-sGH(_,H,V1,V2).
-% s(G(n),H(n),F(n),VerticeOrigem,VerticeDestino) - Não usa nenhuma heurística
-s(V1,V2):-sGH(_,_,V1,V2).
+%% mover para cima na linha central
+move([A,B,C, -,E,F, G,H,I],
+     [-,B,C, A,E,F, G,H,I]).
+move([A,B,C, D,-,F, G,H,I],
+     [A,-,C, D,B,F, G,H,I]).
+move([A,B,C, D,E,-, G,H,I],
+     [A,B,-, D,E,C, G,H,I]).
 
-%Definir o nó (estado) objetivo
-objetivo(f).
+%% mover para cima na linha inferior
+move([A,B,C, D,E,F, G,-,I],
+     [A,B,C, D,-,F, G,E,I]).
+move([A,B,C, D,E,F, G,H,-],
+     [A,B,C, D,E,-, G,H,F]).
+move([A,B,C, D,E,F, -,H,I],
+     [A,B,C, -,E,F, D,H,I]).
+% mover para esquerda na linha superior
+move([A,-,C, D,E,F, G,H,I],
+     [-,A,C, D,E,F, G,H,I]).
+move([A,B,-, D,E,F, G,H,I],
+     [A,-,B, D,E,F, G,H,I]).
 
-%HILL CLIMBING
+%% mover para esquerda na linha central
+move([A,B,C, D,-,F,G,H,I],
+     [A,B,C, -,D,F,G,H,I]).
+move([A,B,C, D,E,-,G,H,I],
+     [A,B,C, D,-,E,G,H,I]).
 
-hillClimbing([[H, No|Caminho]|_], [H, Solucao]):-	
-	objetivo(No),                            
-	reverse([No|Caminho], Solucao).
+%% mover para esquerda na linha inferior
+move([A,B,C, D,E,F, G,-,I],
+     [A,B,C, D,E,F, -,G,I]).
+move([A,B,C, D,E,F, G,H,-],
+     [A,B,C, D,E,F, G,-,H]).
 
-hillClimbing([Caminho|Caminhos], Solucao) :-
-	estendeHillClimbing(Caminho, NovosCaminhos),
-    ordena(NovosCaminhos, CaminhosOrd),
-    append(CaminhosOrd, Caminhos, Caminhos2),
-    hillClimbing(Caminhos2, Solucao).
-	
-estendeHillClimbing([_,No|Caminho],PossiveisNos):-
-	findall([HNovo,NovoNo,No|Caminho],
-	(	sH(HN,No,NovoNo),
-		not(member(NovoNo,[No|Caminho])),
-		HNovo is HN),
-	PossiveisNos).
-	
-%pergunta: hillClimbing([[75,a]],S).
+%% mover linha superior para direita
+move([-,B,C, D,E,F, G,H,I],
+     [B,-,C, D,E,F, G,H,I]).
+move([A,-,C, D,E,F, G,H,I],
+     [A,C,-, D,E,F, G,H,I]).
 
-%BEST FIRST
+%% mover linha central para direita
+move([A,B,C, -,E,F, G,H,I],
+     [A,B,C, E,-,F, G,H,I]).
+move([A,B,C, D,-,F, G,H,I],
+     [A,B,C, D,F,-, G,H,I]).
 
-%Gera a solução se o nó sendo visitado é um nó objetivo
-%O nó gerado no passo anterior é um nó objetivo
-bestFirst([[H,No|Caminho]|_],[H,Solucao]):-	
-	objetivo(No),
-	reverse([No|Caminho],Solucao).
-	
-%O nó corrente não é um nó objetivo
-bestFirst([Caminho|Caminhos], Solucao) :-
-	estendeBestFirst(Caminho, NovosCaminhos), %Gera novos caminhos
-	append(Caminhos,NovosCaminhos,Caminhos1),	
-	ordena(Caminhos1,Caminhos2),
-	bestFirst(Caminhos2, Solucao). 	
-	%Coloca o nó corrente no caminho e continua a recursão
+%% mover para direita na linha inferior
+move([A,B,C, D,E,F,-,H,I],
+     [A,B,C, D,E,F,H,-,I]).
+move([A,B,C, D,E,F,G,-,I],
+     [A,B,C, D,E,F,G,I,-]).
 
-%Gera todos os Caminhos possiveis a partir de Caminho.
-estendeBestFirst([_,No|Caminho],NovosCaminhos):-
-	findall([HNovo,NovoNo,No|Caminho],
-	(	sH(HN,No,NovoNo),
-		not(member(NovoNo,[No|Caminho])),
-		HNovo is HN),
-	NovosCaminhos).
+%% mover para baixo na linha superior
+move([-,B,C, D,E,F, G,H,I],
+     [D,B,C, -,E,F, G,H,I]).
+move([A,-,C, D,E,F, G,H,I],
+     [A,E,C, D,-,F, G,H,I]).
+move([A,B,-, D,E,F, G,H,I],
+     [A,B,F, D,E,-, G,H,I]).
 
-%pergunta: bestFirst([[75,a]],S).
+%% mover para baixo na linha central
+move([A,B,C, -,E,F, G,H,I],
+     [A,B,C, G,E,F, -,H,I]).
+move([A,B,C, D,-,F, G,H,I],
+     [A,B,C, D,H,F, G,-,I]).
+move([A,B,C, D,E,-, G,H,I],
+     [A,B,C, D,E,I, G,H,-]).
 
-%BRANCH AND BOUND
 
-%Gera a solução se o nó sendo visitado é um nó objetivo
-%O nó gerado no passo anterior é um nó objetivo
-branchBound([[H,No|Caminho]|_],[H,Solucao]):-	
-	objetivo(No),
-	reverse([No|Caminho],Solucao).
-	
-%O nó corrente não é um nó objetivo
-branchBound([Caminho|Caminhos], Solucao) :-
-	estendeBranchBound(Caminho, NovosCaminhos), %Gera novos caminhos
-	append(Caminhos,NovosCaminhos,Caminhos1),	
-	ordena(Caminhos1,Caminhos2),
-	branchBound(Caminhos2, Solucao). 	
-	%Coloca o nó corrente no caminho e continua a recursão
 
-%Gera todos os Caminhos possiveis a partir de Caminho.
-estendeBranchBound([GC,No|Caminho],NovosCaminhos):-
-	findall([GNovo,NovoNo,No|Caminho],
-	(	sG(GN,No,NovoNo),
-		not(member(NovoNo,[No|Caminho])),
-		GNovo is GN + GC),
-	NovosCaminhos).
 
-%pergunta: branchBound([[0,a]],S).
-
-%Ordenas os Caminhos por F
-ordena(Caminhos,CaminhosOrd):-
-	quicksort(Caminhos,CaminhosOrd).
-
-quicksort([],[]).
-quicksort([X|Cauda],ListaOrd):-
-	particionar(X,Cauda,Menor,Maior),
-	quicksort(Menor,MenorOrd),
-	quicksort(Maior,MaiorOrd),
-	append(MenorOrd,[X|MaiorOrd],ListaOrd).
-
-particionar(_,[],[],[]).
-particionar(X,[Y|Cauda],[Y|Menor],Maior):-
-	maior(X,Y),!,
-	particionar(X,Cauda,Menor,Maior).
-particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
-	particionar(X,Cauda,Menor,Maior).
-
-maior([F1|_],[F2|_]) :- F1 > F2.
+avaliaPuzzle([A,B,C,D,E,F,G,H,I,J], pontuacao):-
+    avaliaPeca(1,[A,B,C,D,E,F,G,H,I,J], pt1),
+    avaliaPeca(2,[A,B,C,D,E,F,G,H,I,J], pt2),
+    avaliaPeca(3,[A,B,C,D,E,F,G,H,I,J], pt3),
+    avaliaPeca(4,[A,B,C,D,E,F,G,H,I,J], pt4),
+    avaliaPeca(5,[A,B,C,D,E,F,G,H,I,J], pt5),
+    avaliaPeca(6,[A,B,C,D,E,F,G,H,I,J], pt6),
+    avaliaPeca(7,[A,B,C,D,E,F,G,H,I,J], pt7),
+    avaliaPeca(8,[A,B,C,D,E,F,G,H,I,J], pt8),
+    pontuacao is pt1+pt2+pt3+pt4+pt5+pt6+pt7+pt8
+    
