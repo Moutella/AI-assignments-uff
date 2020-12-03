@@ -70,17 +70,18 @@ objetivo([[1,2,3],
       [4,0,5],
       [6,7,8]]).
 
-move(P1,P2, 'up'):-
-    up(P1,P2).
+/*objetivo([[0,1,2],
+      [3,4,5],
+      [6,7,8]]).*/
 
-move(P1,P2, 'down'):-
-    down(P1,P2).
+/*objetivo([[1,2, 3],
+      [4,5, 6],
+      [7,8, 0]]).*/
 
-move(P1,P2, 'right'):-
-    right(P1,P2).
-
-move(P1,P2, 'left'):-
-    left(P1,P2).
+move(P1,P2, 'up'):- up(P1,P2).
+move(P1,P2, 'left'):- left(P1,P2).
+move(P1,P2, 'right'):- right(P1,P2).
+move(P1,P2, 'down'):- down(P1,P2).
 
 % move([[8,2,3], [0,4,5], [6,7,1]],EstadoFuturo,'right'),
 % move(EstadoFuturo,EstadoFuturo2,'up')
@@ -103,6 +104,8 @@ nivel(-1,-1,X,3,X).
 
 geraPontuacao(IAtual,IDest,JAtual,JDest,E):-
     E is abs(IAtual-IDest) + abs(JAtual-JDest).
+
+avaliaPeca(_, 0, 0):- !.
 avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], X, Pts):-
  	indexOf([A,B,C],X,IndexAtual1),
     indexOf([D,E,F],X,IndexAtual2),
@@ -133,21 +136,26 @@ avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], PtsPuzzle):-
 estendeBestFirst([_, Puzzle],Novos):-
     findall([HNovo, PuzzleNovo], (move(Puzzle, PuzzleNovo,_), avaliaPuzzle(PuzzleNovo, HNovo)), Novos).
     
-%- estendeBestFirst([_, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
+% estendeBestFirst([0, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
+
 %Gera a solução se o nó sendo visitado é um nó objetivo
 %O nó gerado no passo anterior é um nó objetivo
-bestFirst([[H,Puzzle]|_],[H,Solucao]):-	
-	objetivo(Puzzle),
-	reverse([Puzzle],Solucao).
+bestFirst([[H,Puzzle]|_],[H,Puzzle]):-	
+	objetivo(Puzzle), !.
 	
 %O nó corrente não é um nó objetivo
 bestFirst([Puzzle|Puzzles], Solucao) :-
 	estendeBestFirst(Puzzle, NovosPuzzles), %Gera novos Puzzles
-    print(NovosPuzzles),
 	append(Puzzles,NovosPuzzles,Puzzles1),	
 	ordena(Puzzles1,Puzzles2),
+    %ordena(NovosPuzzles,Puzzles2),
+    print('NovosEstados'),
+    print(Puzzles2),
 	bestFirst(Puzzles2, Solucao). 	
 	%Coloca o nó corrente no Puzzle e continua a recursão
+
+% bestFirst([[0, [[8,2,3], [0,4,5], [6,7,1]]]],Novos).
+% bestFirst([[0, [[0,2,3], [1,4,5], [6,7,8]]]],Novos).
 
 %Ordenas os Caminhos por F
 ordena(Caminhos,CaminhosOrd):-
@@ -167,4 +175,16 @@ particionar(X,[Y|Cauda],[Y|Menor],Maior):-
 particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
 	particionar(X,Cauda,Menor,Maior).
 
-maior([F1|_],[F2|_]) :- F1 < F2.
+maior([F1|_],[F2|_]) :- F1 > F2.
+
+
+
+/*dfs(S, Path, Path) :- goal(S).
+
+dfs(S, Checked, Path) :-
+    % try a move
+    move(S, S2),
+    % ensure the resulting state is new
+    \+member(S2, Checked),
+    % and that this state leads to the goal
+    dfs(S2, [S2|Checked], Path). */
