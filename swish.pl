@@ -130,11 +130,10 @@ avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], PtsPuzzle):-
     avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], H, PtsH),
     avaliaPeca([[A,B,C],[D,E,F],[G,H,I]], I, PtsI),
     PtsPuzzle is PtsA+PtsB+PtsC+PtsD+PtsE+PtsF+PtsG+PtsH+PtsI.
-
+1
 %- avaliaPuzzle([[8,2,3], [0,4,5], [6,7,1]],Pts).
 
 estendeBestFirst([_, Puzzle], Puzzles, Novos):-
-    print(Puzzles),
     findall([HNovo, PuzzleNovo], 
     (     
           move(Puzzle, PuzzleNovo,_), 
@@ -152,12 +151,23 @@ bestFirst([[H,Puzzle]|_],[H,Puzzle]):-
 %O nó corrente não é um nó objetivo
 bestFirst([Puzzle|Puzzles], Solucao) :-
 	estendeBestFirst(Puzzle, Puzzles, NovosPuzzles), %Gera novos Puzzles
-	append(Puzzles,NovosPuzzles,Puzzles1),	
-	ordena(Puzzles1,Puzzles2),
-    %ordena(NovosPuzzles,Puzzles2),
-    print('NovosEstados'),
+    ordena(NovosPuzzles,Puzzles2),
+    
+	append(Puzzles2,Puzzles,PuzzlesOrd),
+    print('Puzzles: '),
+    print(Puzzles),
+    nl(),
+     print('Puzzles2: '),
     print(Puzzles2),
-	bestFirst(Puzzles2, Solucao). 	
+    nl(),
+    print('PuzzlesOrd: '),
+    print(PuzzlesOrd),
+    nl(),
+    %ordena(NovosPuzzles,Puzzles2),
+    /*print('NovosEstados'),
+    print(Puzzles2),
+    print('-------------------------------------------'),*/
+	bestFirst(PuzzlesOrd, Solucao). 	
 	%Coloca o nó corrente no Puzzle e continua a recursão
 
 % bestFirst([[0, [[8,2,3], [0,4,5], [6,7,1]]]],Novos).
