@@ -161,7 +161,7 @@ bestFirst([Puzzle|Puzzles], Visitados, Solucao) :-
 	%Coloca o nó corrente no Puzzle e continua a recursão
 
 %? - bestFirst([[_, [[1,8,2], [0,4,3], [7,6,5]]]], [[_, [[1,8,2], [0,4,3], [7,6,5]]]], Solucao).
-
+%? - bestFirst([[_, [[1,8,0], [2,4,3], [7,6,5]]]], [[_, [[1,8,0], [2,4,3], [7,6,5]]]], Solucao).
 %Ordenas os Caminhos por F
 ordena(Caminhos,CaminhosOrd):-
 	quicksort(Caminhos,CaminhosOrd).
