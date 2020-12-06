@@ -146,8 +146,8 @@ estendeBestFirst([_, Puzzle], Puzzles, Visitados , Novos):-
 
 %Gera a solução se o nó sendo visitado é um nó objetivo
 %O nó gerado no passo anterior é um nó objetivo
-bestFirst([[_,Puzzle]|_],_,[_,Puzzle]):-
-    writeln(Puzzle),
+bestFirst([[Valor,Puzzle]|_],_,[Valor,Puzzle]):-
+    %writeln(Puzzle),
 	objetivo(Puzzle), !.
 	
 %O nó corrente não é um nó objetivo
@@ -162,6 +162,47 @@ bestFirst([Puzzle|Puzzles], Visitados, Solucao) :-
 
 %? - bestFirst([[_, [[1,8,2], [0,4,3], [7,6,5]]]], [[_, [[1,8,2], [0,4,3], [7,6,5]]]], Solucao).
 %? - bestFirst([[_, [[1,8,0], [2,4,3], [7,6,5]]]], [[_, [[1,8,0], [2,4,3], [7,6,5]]]], Solucao).
+
+
+estendeAEstrela(Contador, [_, Puzzle], Puzzles, Visitados , Novos):-
+    findall([HGNovo, PuzzleNovo], 
+    (     
+          move(Puzzle, PuzzleNovo,_), 
+          avaliaPuzzle(PuzzleNovo, HNovo),
+          not(member([_, PuzzleNovo],Puzzles)),
+          not(member([_, PuzzleNovo],Visitados)),
+    	  HGNovo is HNovo + Contador
+    )
+    , Novos).
+    
+% estendeBestFirst([0, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
+
+%Gera a solução se o nó sendo visitado é um nó objetivo
+%O nó gerado no passo anterior é um nó objetivo
+aEstrela(_, [[Valor,Puzzle]|_],_,[Valor,Puzzle]):-
+    %writeln(Puzzle),
+	objetivo(Puzzle), !.
+	
+%O nó corrente não é um nó objetivo
+aEstrela(Contador, [Puzzle|Puzzles], Visitados, Solucao) :-
+    ContadorNovo is Contador + 1,
+	estendeAEstrela(ContadorNovo, Puzzle, Puzzles, Visitados, NovosPuzzles), %Gera novos Puzzles
+	append(Puzzles,NovosPuzzles,Puzzles1),
+    append([Puzzle], Visitados, Visitados2),
+	ordena(Puzzles1,Puzzles2),
+    %ordena(NovosPuzzles,Puzzles2),
+	aEstrela(ContadorNovo, Puzzles2, Visitados2, Solucao). 	
+	%Coloca o nó corrente no Puzzle e continua a recursão
+
+%Ineficiente
+%- Teoria 1:
+%- Acaba sendo pior que o best first, devido a baixa rquantidade de valores possiveis para h(n)
+%- Expandimos muito os passos iniciais, o que não ajuda muito
+%- aEstrela(0, [[_, [[1,2,3], [4,7,5], [6,8,0]]]], [[_, [[1,2,3], [4,7,5], [6,8,0]]]], Solucao).
+
+
+
+
 %Ordenas os Caminhos por F
 ordena(Caminhos,CaminhosOrd):-
 	quicksort(Caminhos,CaminhosOrd).
@@ -181,15 +222,3 @@ particionar(X,[Y|Cauda],Menor,[Y|Maior]):-
 	particionar(X,Cauda,Menor,Maior).
 
 maior([F1|_],[F2|_]) :- F1 > F2.
-
-
-
-dfs(S, Path, Path) :- goal(S).
-
-dfs(S, Checked, Path) :-
-    % try a move
-    move(S, S2),
-    % ensure the resulting state is new
-    \+member(S2, Checked),
-    % and that this state leads to the goal
-    dfs(S2, [S2|Checked], Path).
