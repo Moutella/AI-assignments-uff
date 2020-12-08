@@ -125,7 +125,7 @@ avaliaPuzzle([[A,B,C],[D,E,F],[G,H,I]], PtsPuzzle):-
 
 %- avaliaPuzzle([[8,2,3], [0,4,5], [6,7,1]],Pts).
 
-estendeBestFirst([_, Puzzle], Puzzles, Visitados , Novos):-
+estende([_, Puzzle], Puzzles, Visitados , Novos):-
     findall([HNovo, PuzzleNovo], 
     (     
           move(Puzzle, PuzzleNovo,_), 
@@ -135,60 +135,106 @@ estendeBestFirst([_, Puzzle], Puzzles, Visitados , Novos):-
      )
      , Novos).
     
-% estendeBestFirst([0, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
+% estende([0, [[8,2,3], [0,4,5], [6,7,1]]],Novos).
 
 
 % BEST FIRST
 
-bestFirst([[Valor,Puzzle]|_],_,[Valor,Puzzle]):-
+bestFirst([[H,Puzzle]|_],_,[H,Puzzle]):-
      objetivo(Puzzle), !.
 	
 
 bestFirst([Puzzle|Puzzles], Visitados, Solucao) :-
-	estendeBestFirst(Puzzle, Puzzles, Visitados, NovosPuzzles), 
+	estende(Puzzle, Puzzles, Visitados, NovosPuzzles), 
 	append(Puzzles,NovosPuzzles,Puzzles1),
      append([Puzzle], Visitados, Visitados2),
 	ordena(Puzzles1,Puzzles2),
 	bestFirst(Puzzles2, Visitados2, Solucao). 	
 
 
-%? - bestFirst([[_, [[1,8,2], [0,4,3], [7,6,5]]]], [[_, [[1,8,2], [0,4,3], [7,6,5]]]], Solucao).
-%? - bestFirst([[_, [[1,8,0], [2,4,3], [7,6,5]]]], [[_, [[1,8,0], [2,4,3], [7,6,5]]]], Solucao).
+%? - bestFirst([[0, [[1,8,2], [0,4,3], [7,6,5]]]], [], Solucao).
+%? - bestFirst([[0, [[1,8,0], [2,4,3], [7,6,5]]]], [], Solucao).
 
 
 % A ESTRELA
-estendeAEstrela(Contador, [_, Puzzle], Puzzles, Visitados , Novos):-
-    findall([HGNovo, PuzzleNovo], 
+
+estendeAEstrela(G, [_, Puzzle], Puzzles, Visitados , Novos):-
+    findall([FNovo, PuzzleNovo], 
      (     
           move(Puzzle, PuzzleNovo,_), 
           avaliaPuzzle(PuzzleNovo, HNovo),
           not(member([_, PuzzleNovo],Puzzles)),
           not(member([_, PuzzleNovo],Visitados)),
-          HGNovo is HNovo + Contador
+          FNovo is HNovo + G
      )
      , Novos).
     
 
-aEstrela(_, [[Valor,Puzzle]|_],_,[Valor,Puzzle]):-
+aEstrela(_, [[F,Puzzle]|_],_,[F,Puzzle]):-
 	objetivo(Puzzle), !.
 	
 
-aEstrela(Contador, [Puzzle|Puzzles], Visitados, Solucao) :-
-     ContadorNovo is Contador + 1,
-	estendeAEstrela(ContadorNovo, Puzzle, Puzzles, Visitados, NovosPuzzles),
+aEstrela(G, [Puzzle|Puzzles], Visitados, Solucao) :-
+     GNovo is G + 1,
+	estendeAEstrela(GNovo, Puzzle, Puzzles, Visitados, NovosPuzzles),
 	append(Puzzles,NovosPuzzles,Puzzles1),
      append([Puzzle], Visitados, Visitados2),
 	ordena(Puzzles1,Puzzles2),
-	aEstrela(ContadorNovo, Puzzles2, Visitados2, Solucao). 	
+	aEstrela(GNovo, Puzzles2, Visitados2, Solucao). 	
 
 
 % Ineficiente
 %- Teoria 1:
 %- Acaba sendo pior que o best first, devido a baixa rquantidade de valores possiveis para h(n)
 %- Expandimos muito os passos iniciais, o que não ajuda muito
-%- aEstrela(0, [[_, [[1,2,3], [4,7,5], [6,8,0]]]], [[_, [[1,2,3], [4,7,5], [6,8,0]]]], Solucao).
+%- aEstrela(0, [[0, [[1,2,3], [4,7,5], [6,8,0]]]], [[0, [[1,2,3], [4,7,5], [6,8,0]]]], Solucao).
 
 
+% HILL CLIMBING
+
+hillClimbing([[H,Puzzle]|_], _, [H,Puzzle]):-
+     objetivo(Puzzle), !.
+	
+
+hillClimbing([Puzzle|Puzzles], Visitados, Solucao) :-
+	estende(Puzzle, Puzzles, Visitados, NovosPuzzles), 
+     ordena(NovosPuzzles, PuzzlesOrd),
+	append(PuzzlesOrd,Puzzles,Puzzles1),
+     append([Puzzle], Visitados, Visitados2),
+	hillClimbing(Puzzles1, Visitados2, Solucao).
+
+%? - hillClimbing([[0, [[1,8,2], [0,4,3], [7,6,5]]]], [], Solucao).
+%? - hillClimbing([[0, [[1,8,0], [2,4,3], [7,6,5]]]], [], Solucao).
+
+
+% BRANCH AND BOUND
+
+estendeBranchBound([G, Puzzle], Puzzles, Visitados , Novos):-
+    findall([GNovo, PuzzleNovo], 
+    (     
+          move(Puzzle, PuzzleNovo,_), 
+          not(member([_, PuzzleNovo],Puzzles)),
+          not(member([_, PuzzleNovo],Visitados)),
+          GNovo is G + 1
+     )
+     , Novos).
+
+branchBound([[G,Puzzle]|_], _, [G,Puzzle]):-	
+	objetivo(Puzzle), !.
+	
+
+branchBound([Puzzle|Puzzles], Visitados, Solucao) :-
+	estendeBranchBound(Puzzle, Puzzles, Visitados, NovosPuzzles), 
+	append(Puzzles,NovosPuzzles,Puzzles1),	
+     append([Puzzle], Visitados, Visitados2),
+	ordena(Puzzles1, Puzzles2),
+	branchBound(Puzzles2, Visitados2, Solucao). 	
+
+%? - branchBound([[0, [[1,8,2], [0,4,3], [7,6,5]]]], [], Solucao).
+%? - branchBound([[0, [[1,8,0], [2,4,3], [7,6,5]]]], [], Solucao).
+
+
+% Ordenação
 ordena(Caminhos,CaminhosOrd):-
      quicksort(Caminhos,CaminhosOrd).
 
