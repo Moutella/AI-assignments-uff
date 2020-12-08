@@ -80,7 +80,7 @@ move(P1,P2, 'down'):- down(P1,P2).
 % move(EstadoFuturo,EstadoFuturo2,'up')
 
 
-indexOf([], _, -4):- !. % se não estivar na lista, retornará -1(stonks) RIP GENERICIDADE
+indexOf([], _, -4):- !. % se não estivar na lista, retornará -1. não genérico, apenas para listas que sabemos que tem 3 elementos sempre
 indexOf([Element|_], Element, 0):-!. % achou o elemento
 indexOf([_|Tail], Element, Index):-
      indexOf(Tail, Element, Index1), % verificar no final da lista
